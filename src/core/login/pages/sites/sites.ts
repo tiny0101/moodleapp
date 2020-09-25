@@ -20,6 +20,8 @@ import { CoreDomUtilsProvider } from '@providers/utils/dom';
 import { CorePushNotificationsProvider } from '@core/pushnotifications/providers/pushnotifications';
 import { CoreLoginHelperProvider } from '../../providers/helper';
 import { CoreFilterProvider } from '@core/filter/providers/filter';
+import { CoreConfigConstants } from '../../../../configconstants';
+import { CoreApp } from '@providers/app';
 
 /**
  * Page that displays the list of stored sites.
@@ -47,26 +49,36 @@ export class CoreLoginSitesPage {
      * View loaded.
      */
     ionViewDidLoad(): void {
-        this.sitesProvider.getSortedSites().then((sites) => {
-            if (sites.length == 0) {
-                this.loginHelper.goToAddSite(true);
-            }
 
-            // Remove protocol from the url to show more url text.
-            this.sites = sites.map((site) => {
-                site.siteUrl = site.siteUrl.replace(/^https?:\/\//, '');
-                site.badge = 0;
-                this.pushNotificationsProvider.getSiteCounter(site.id).then((counter) => {
-                    site.badge = counter;
-                });
+        let pageName, params;
+        // Fixed URL is set, go to credentials page.
+        const url = 'http://localhost:8009';
 
-                return site;
-            });
+        pageName = 'CoreLoginCredentialsPage';
+        params = { siteUrl: url };
 
-            this.showDelete = false;
-        }).catch(() => {
-            // Shouldn't happen.
-        });
+        CoreApp.instance.getRootNavController().setRoot(pageName, params, { animate: false });
+
+        // this.sitesProvider.getSortedSites().then((sites) => {
+        //     if (sites.length == 0) {
+        //         this.loginHelper.goToAddSite(true);
+        //     }
+        //
+        //     // Remove protocol from the url to show more url text.
+        //     this.sites = sites.map((site) => {
+        //         site.siteUrl = site.siteUrl.replace(/^https?:\/\//, '');
+        //         site.badge = 0;
+        //         this.pushNotificationsProvider.getSiteCounter(site.id).then((counter) => {
+        //             site.badge = counter;
+        //         });
+        //
+        //         return site;
+        //     });
+        //
+        //     this.showDelete = false;
+        // }).catch(() => {
+        //     // Shouldn't happen.
+        // });
     }
 
     /**
