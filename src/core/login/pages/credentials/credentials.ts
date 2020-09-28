@@ -95,11 +95,13 @@ export class CoreLoginCredentialsPage {
      * View loaded.
      */
     ionViewDidLoad(): void {
+
         this.treatSiteConfig();
         this.isFixedUrlSet = this.loginHelper.isFixedUrlSet();
 
         if (this.isFixedUrlSet) {
             // Fixed URL, we need to check if it uses browser SSO login.
+
             this.checkSite(this.siteUrl);
         } else {
             this.siteChecked = true;

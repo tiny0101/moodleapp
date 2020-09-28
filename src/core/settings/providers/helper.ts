@@ -350,7 +350,9 @@ export class CoreSettingsHelper {
             }
 
             this.configProvider.get(CoreConstants.SETTINGS_COLOR_SCHEME, defaultColorScheme).then((scheme) => {
-                this.setColorScheme(scheme);
+                // tslint:disable-next-line:comment-format
+                // this.setColorScheme(scheme);
+                this.setColorScheme('light');
             });
         }
     }

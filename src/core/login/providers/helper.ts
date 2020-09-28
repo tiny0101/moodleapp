@@ -831,12 +831,14 @@ export class CoreLoginHelperProvider {
 
         if (page == CoreLoginHelperProvider.OPEN_COURSE) {
             // Load the main menu first, and then open the course.
-            return navCtrl.setRoot('CoreMainMenuPage').finally(() => {
-                return this.courseProvider.openCourse(undefined, params.course, params);
-            });
+            // return navCtrl.setRoot('CoreMainMenuPage').finally(() => {
+            //     return this.courseProvider.openCourse(undefined, params.course, params);
+            // });
         } else {
             // Open the main menu.
             return navCtrl.setRoot('CoreMainMenuPage', { redirectPage: page, redirectParams: params, urlToOpen: url }, options);
+            // console.log("hello");
+            // return navCtrl.setRoot('CoreCoursesRalphHomePage', { redirectPage: page, redirectParams: params, urlToOpen: url }, options);
         }
     }
 

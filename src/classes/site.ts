@@ -1531,21 +1531,23 @@ export class CoreSite {
      * @return Promise resolved it local_mobile was added, rejected otherwise.
      */
     checkIfLocalMobileInstalledAndNotUsed(): Promise<any> {
-        const appUsesLocalMobile = this.checkIfAppUsesLocalMobile();
 
-        if (appUsesLocalMobile) {
-            // App already uses local_mobile, it wasn't added.
-            return Promise.reject(null);
-        }
-
-        return this.checkLocalMobilePlugin().then((data: LocalMobileResponse): any => {
-            if (typeof data.service == 'undefined') {
-                // The local_mobile NOT installed. Reject.
-                return Promise.reject(null);
-            }
-
-            return data;
-        });
+        return Promise.reject(null);
+        // const appUsesLocalMobile = this.checkIfAppUsesLocalMobile();
+        //
+        // if (appUsesLocalMobile) {
+        //     // App already uses local_mobile, it wasn't added.
+        //     return Promise.reject(null);
+        // }
+        //
+        // return this.checkLocalMobilePlugin().then((data: LocalMobileResponse): any => {
+        //     if (typeof data.service == 'undefined') {
+        //         // The local_mobile NOT installed. Reject.
+        //         return Promise.reject(null);
+        //     }
+        //
+        //     return data;
+        // });
     }
 
     /**
