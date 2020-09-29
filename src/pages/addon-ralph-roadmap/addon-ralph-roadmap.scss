@@ -1,0 +1,34 @@
+page-addon-ralph-roadmap {
+
+  .road-point {
+    border: 3px solid #bd9f70;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    color: #002855;
+    background: white;
+    display: flex;
+    white-space: pre-wrap;
+    padding-top: 0px;
+    font-weight: bold;
+    font-family: "Times New Roman";
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    z-index: 999;
+  }
+
+  .goal-point {
+    border: 1px solid #bd9f70;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    background: #bd9f70;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+}

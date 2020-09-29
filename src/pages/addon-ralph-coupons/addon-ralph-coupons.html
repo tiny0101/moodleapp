@@ -1,0 +1,25 @@
+<!--
+  Generated template for the AddonRalphCouponsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{ 'mm.user.mycoupons' | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content [ngStyle]="{'background-color':'white'}">
+  <div *ngIf="couponDraw" >
+    <div [ngStyle]="{'max-width': '380px', 'width': '100%', 'margin': '0 auto', 'font-size': '18px', 'background-color': '#002060', 'color': 'white', 'text-align': 'center', 'height': '60px', 'padding-top': '18px', 'margin-top': '30px'}" (click)="onRedeemCouponsClicked()">
+      {{ 'mm.ralph.coupons.selectandredeem' | translate}}
+    </div>
+    <div class="clearfix" style="{'max-width': '380px', 'width': '100%', 'margin': '0 auto', 'border': '1px solid #002060', 'padding': '8px; margin-top: 10px'}">
+      <div id="coupon_item_{{i}}" *ngFor="let coupon of couponItems; index as i;" class="coupon-circle coupon-circle-normal" (click)="onSelectCoupon(i)">
+        {{i+1}}
+      </div>
+    </div>
+  </div>
+
+</ion-content>

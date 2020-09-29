@@ -15,6 +15,17 @@
         <ion-item text-center *ngIf="(!handlers || !handlers.length) && !handlersLoaded">
             <ion-spinner></ion-spinner>
         </ion-item>
+
+        <a ion-item (click)="openRoadMap()" title="{{ 'mm.ralph.sidemenu.roadmap' | translate }}">
+            <core-icon name="fa-map-marker" item-start></core-icon>
+            <h2>{{ 'mm.ralph.sidemenu.roadmap' | translate }}</h2>
+        </a>
+
+        <a ion-item (click)="openCoupons()" title="{{ 'mm.ralph.sidemenu.coupons' | translate }}">
+            <core-icon name="fa-trophy" item-start></core-icon>
+            <h2>{{ 'mm.ralph.sidemenu.coupons' | translate }}</h2>
+        </a>
+
         <a ion-item *ngFor="let handler of handlers" [ngClass]="['core-moremenu-handler', handler.class || '']" (click)="openHandler(handler)" title="{{ handler.title | translate }}" detail-push>
             <core-icon [name]="handler.icon" item-start></core-icon>
             <h2>{{ handler.title | translate}}</h2>

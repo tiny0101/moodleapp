@@ -172,6 +172,20 @@ export class CoreMainMenuMorePage implements OnDestroy {
     }
 
     /**
+     * Open Ralph RoadMap screen
+     */
+    openRoadMap(): void {
+        this.navCtrl.push('AddonRalphRoadmapPage');
+    }
+
+    /**
+     * Open Ralph RoadMap Coupons
+     */
+    openCoupons(): void {
+        this.navCtrl.push('AddonRalphCouponsPage');
+    }
+
+    /**
      * Scan and treat a QR code.
      */
     scanQR(): void {

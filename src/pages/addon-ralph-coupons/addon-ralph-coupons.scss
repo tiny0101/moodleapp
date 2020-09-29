@@ -1,0 +1,35 @@
+page-addon-ralph-coupons {
+  .coupon-circle {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+    float: left;
+    border: 1px solid #002855;
+    border-radius: 50%;
+    text-align: center;
+    padding-top: 26px;
+  }
+
+  .coupon-circle-normal {
+    background-color: #002855;
+    color: white;
+    font-size: 23px;
+  }
+
+  .coupon-circle-selected1 {
+    background-image: url(img/ralph/trophy1.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: transparent;
+    color: transparent;
+  }
+
+  .coupon-circle-selected2 {
+    background-image: url(img/ralph/trophy2.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: transparent;
+    color: transparent;
+  }
+
+}

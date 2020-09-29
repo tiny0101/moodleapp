@@ -1,0 +1,53 @@
+<!--
+  Generated template for the AddonRalphRoadmapPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{ "mm.ralph.sidemenu.roadmap" | translate }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content style="background: white; padding-bottom: 50px;">
+  <div style="margin: 0 auto; width: 100%; max-width: 1024px; height: 100%; text-align: center; background: white;">
+      <div style="width: 100%; max-width: 414px; margin: 0 auto;">
+        <div style="position: relative;">
+          <img src="assets/img/ralph/roadmap/roadmap_start.png"/>
+          <div class="road-point" *ngIf="roadPoints.length > 0" style="position:absolute; bottom: -27px; right: 23px;" (click)="onSelectRoadmapItem(0)">{{roadPoints[0].name | translate}}</div>
+          <div style="position:absolute; z-index: 999; bottom: 42px; right: 36px;" *ngIf="currentStep < 0">
+            <img src="assets/img/ralph/roadmap/roadsign.png" style="width:32px;"/>
+          </div>
+          <div style="position:absolute; z-index: 999; bottom: 42px; right: 36px;" *ngIf="currentStep >= 0">
+            <img src="assets/img/ralph/roadmap/roadsignflagged.png" style="width:32px;"/>
+          </div>
+        </div>
+        <div id="roadmap_item_{{key}}" *ngFor = "let key of roadPointsKeys" (click)="onSelectRoadmapItem(key)" style="position:relative">
+          <img src="assets/img/ralph/roadmap/roadmap_node_{{(key-1)%2}}.png"/>
+          <div class="road-point" *ngIf="key%2==0" style="position:absolute; bottom: -27px; right: 23px;">{{roadPoints[key].name | translate}}</div>
+          <div class="road-point" *ngIf="key%2==1" style="position:absolute; left: 10px; bottom: -27px;">{{roadPoints[key].name | translate}}</div>
+
+          <div style="position:absolute; z-index: 999; bottom: 42px; right: 36px;" *ngIf="key%2==0">
+            <img src="assets/img/ralph/roadmap/roadsignflagged.png" style="width:32px;" *ngIf="currentStep >= key"/>
+            <img src="assets/img/ralph/roadmap/roadsign.png" style="width:32px;" *ngIf="currentStep < key"/>
+          </div>
+          <div style="position:absolute; z-index: 999; bottom: 42px; left: 23px;" *ngIf="key%2==1">
+            <img src="assets/img/ralph/roadmap/roadsignflagged.png" style="width:32px;" *ngIf="currentStep >= key"/>
+            <img src="assets/img/ralph/roadmap/roadsign.png" style="width:32px;" *ngIf="currentStep < key"/>
+          </div>
+
+        </div>
+        <div style="position:relative">
+          <img src="assets/img/ralph/roadmap/roadmap_end_left.png" *ngIf="roadPoints.length%2 == 0"/>
+          <img src="assets/img/ralph/roadmap/roadmap_end_right.png" *ngIf="roadPoints.length%2 == 1"/>
+          <div class="goal-point" *ngIf="roadPoints.length%2 == 1" style="position:absolute; left: 71px; bottom: -10px;">
+            {{ 'mm.ralph.roadmap_goal' | translate }}
+          </div>
+          <div class="goal-point" *ngIf="roadPoints.length%2 == 0" style="position:absolute; right: 71px; bottom: -10px;">
+            {{ 'mm.ralph.roadmap_goal' | translate }}
+          </div>
+        </div>
+      </div>
+  </div>
+</ion-content>

@@ -31,5 +31,18 @@
     "core.strftimerecentfull": "%a, %b %d, %Y, %I:%M %p",
     "core.strftimetime": "%I:%M %p",
     "core.thisdirection": "ltr",
-    "core.user.lastname": "Last name"
+    "core.user.lastname": "Last name",
+
+    "mm.ralph.sidemenu.roadmap" : "Road Map",
+    "mm.ralph.roadmap_firstday" : "Day \n1",
+    "mm.ralph.roadmap_firstweek" : "1st \nWeek",
+    "mm.ralph.roadmap_firstmonth" : "1st \n30 Days",
+    "mm.ralph.roadmap_first90days" : "1st \n90 Days",
+    "mm.ralph.roadmap_keeplearning" : "Discover \nMore",
+    "mm.ralph.roadmap_goal" : "Goal",
+
+    "mm.ralph.sidemenu.coupons": "Redeem Rewards",
+    "mm.user.mycoupons" : "Redeem Rewards",
+    "mm.ralph.coupons.selectandredeem": "Select rewards and click here to redeem",
+    "mm.ralph.coupons.redeemcouponconfirmation": "You have selected {{coupon}} coupons to redeem, are you sure?"
 }
