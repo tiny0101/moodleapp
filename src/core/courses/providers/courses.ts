@@ -866,6 +866,42 @@ export class CoreCoursesProvider {
         });
     }
 
+    redeemCoupons(couponIds: string, preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId,
+                    couponids: couponIds
+                },
+                preSets = {
+                    getFromCache: 0
+                };
+
+            return site.read('local_ralphlauren_redeem_user_coupons', data, preSets).then((result) => {
+                return result;
+            });
+        });
+    }
+
+    getUserCoupons(preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId
+                },
+                preSets = {
+                    getFromCache: 0
+                };
+
+            return site.read('local_ralphlauren_get_user_coupons', data, preSets).then((coupons) => {
+                return coupons;
+            });
+        });
+    }
+
     /**
      * Get cache key for get user courses WS call.
      *

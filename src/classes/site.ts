@@ -625,6 +625,7 @@ export class CoreSite {
      */
     request(method: string, data: any, preSets: CoreSiteWSPreSets, retrying?: boolean): Promise<any> {
         const initialToken = this.token;
+
         data = data || {};
 
         if (!this.appProvider.isOnline() && this.offlineDisabled) {
@@ -1802,6 +1803,8 @@ export class CoreSite {
         if (!disabledFeatures) {
             return false;
         }
+
+        console.log('disabledFeatures:-', disabledFeatures);
 
         const regEx = new RegExp('(,|^)' + this.textUtils.escapeForRegex(name) + '(,|$)', 'g');
 

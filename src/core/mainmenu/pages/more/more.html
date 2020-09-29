@@ -16,12 +16,12 @@
             <ion-spinner></ion-spinner>
         </ion-item>
 
-        <a ion-item (click)="openRoadMap()" title="{{ 'mm.ralph.sidemenu.roadmap' | translate }}">
+        <a *ngIf="showRoadMap" ion-item (click)="openRoadMap()" title="{{ 'mm.ralph.sidemenu.roadmap' | translate }}">
             <core-icon name="fa-map-marker" item-start></core-icon>
             <h2>{{ 'mm.ralph.sidemenu.roadmap' | translate }}</h2>
         </a>
 
-        <a ion-item (click)="openCoupons()" title="{{ 'mm.ralph.sidemenu.coupons' | translate }}">
+        <a *ngIf="showCoupons" ion-item (click)="openCoupons()" title="{{ 'mm.ralph.sidemenu.coupons' | translate }}">
             <core-icon name="fa-trophy" item-start></core-icon>
             <h2>{{ 'mm.ralph.sidemenu.coupons' | translate }}</h2>
         </a>
@@ -54,7 +54,7 @@
             <ion-icon name="help-buoy" item-start aria-hidden="true"></ion-icon>
             <h2>{{ 'core.mainmenu.help' | translate }}</h2>
         </a>
-        <a ion-item (click)="openSitePreferences()" title="{{ 'core.settings.preferences' | translate }}">
+        <a ion-item *ngIf="showPreference"  (click)="openSitePreferences()" title="{{ 'core.settings.preferences' | translate }}">
             <core-icon name="fa-wrench" item-start></core-icon>
             <h2>{{ 'core.settings.preferences' | translate }}</h2>
         </a>
@@ -63,7 +63,7 @@
             <h2>{{ logoutLabel | translate }}</h2>
         </a>
         <ion-item-divider></ion-item-divider>
-        <a ion-item (click)="openAppSettings()" title="{{ 'core.settings.appsettings' | translate }}">
+        <a *ngIf="showAppSettings"  ion-item (click)="openAppSettings()" title="{{ 'core.settings.appsettings' | translate }}">
             <core-icon name="fa-cogs" item-start></core-icon>
             <h2>{{ 'core.settings.appsettings' | translate }}</h2>
         </a>

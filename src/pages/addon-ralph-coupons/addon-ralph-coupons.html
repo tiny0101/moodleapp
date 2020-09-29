@@ -16,8 +16,18 @@
       {{ 'mm.ralph.coupons.selectandredeem' | translate}}
     </div>
     <div class="clearfix" style="{'max-width': '380px', 'width': '100%', 'margin': '0 auto', 'border': '1px solid #002060', 'padding': '8px; margin-top: 10px'}">
-      <div id="coupon_item_{{i}}" *ngFor="let coupon of couponItems; index as i;" class="coupon-circle coupon-circle-normal" (click)="onSelectCoupon(i)">
-        {{i+1}}
+      <div id="coupon_item_{{i}}" *ngFor="let coupon of couponItems; index as i;" (click)="onSelectCoupon(i)">
+        <div *ngIf="selectedIndices.indexOf(i) > -1">
+          <div *ngIf="coupon.coupon_type == 0" class="coupon-circle coupon-circle-selected1" >
+            {{i+1}}
+          </div>
+          <div *ngIf="coupon.coupon_type == 1" class="coupon-circle coupon-circle-selected2" >
+            {{i+1}}
+          </div>
+        </div>
+        <div *ngIf="selectedIndices.indexOf(i) == -1" class="coupon-circle coupon-circle-normal" >
+          {{i+1}}
+        </div>
       </div>
     </div>
   </div>

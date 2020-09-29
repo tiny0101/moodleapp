@@ -47,6 +47,11 @@ export class CoreMainMenuMorePage implements OnDestroy {
     customItems: CoreMainMenuCustomItem[];
     siteUrl: string;
 
+    showRoadMap: boolean;
+    showCoupons: boolean;
+    showPreference: boolean;
+    showAppSettings: boolean;
+
     protected subscription;
     protected langObserver;
     protected updateSiteObserver;
@@ -130,6 +135,13 @@ export class CoreMainMenuMorePage implements OnDestroy {
         this.showWeb = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_website');
         this.showHelp = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_help');
 
+        this.showRoadMap = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaRoadmap');
+        this.showCoupons = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaCoupons');
+        this.showAppSettings = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaAppSettings');
+
+        // this.showRoadMap = false;
+        // this.showCoupons = false;
+
         currentSite.getDocsUrl().then((docsUrl) => {
             this.docsUrl = docsUrl;
         });
@@ -145,6 +157,7 @@ export class CoreMainMenuMorePage implements OnDestroy {
      * @param handler Handler to open.
      */
     openHandler(handler: CoreMainMenuHandlerData): void {
+        console.log('handler.pageParams', handler.pageParams);
         this.navCtrl.push(handler.page, handler.pageParams);
     }
 
