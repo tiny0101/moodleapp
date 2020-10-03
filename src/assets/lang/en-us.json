@@ -44,5 +44,10 @@
     "mm.ralph.sidemenu.coupons": "Redeem Rewards",
     "mm.user.mycoupons" : "Redeem Rewards",
     "mm.ralph.coupons.selectandredeem": "Select rewards and click here to redeem",
-    "mm.ralph.coupons.redeemcouponconfirmation": "You have selected {{coupon}} coupons to redeem, are you sure?"
+    "mm.ralph.coupons.redeemcouponconfirmation": "You have selected {{coupon}} coupons to redeem, are you sure?",
+
+    "mm.course.bookmarkcourse": 'Toggle bookmark',
+    "mm.courses.errorsetbookmark": 'Failed in setting bookmark',
+    "mm.courses.errorgetbookmark": "Failed in getting bookmark status"
+
 }

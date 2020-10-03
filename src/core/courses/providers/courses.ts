@@ -489,8 +489,9 @@ export class CoreCoursesProvider {
                     value: field ? value : ''
                 },
                 preSets = {
-                    cacheKey: this.getCoursesByFieldCacheKey(field, value),
-                    updateFrequency: CoreSite.FREQUENCY_RARELY
+                    getFromCache: false
+                    // cacheKey: this.getCoursesByFieldCacheKey(field, value),
+                    // updateFrequency: CoreSite.FREQUENCY_RARELY
                 };
 
             return site.read('core_course_get_courses_by_field', data, preSets).then((courses) => {
@@ -806,10 +807,11 @@ export class CoreCoursesProvider {
                     ? this.sitesProvider.getReadingStrategyPreSets(strategy)
                     : { omitExpires: !!preferCache },
                 preSets = {
-                    cacheKey: this.getUserCoursesCacheKey(),
-                    getCacheUsingCacheKey: true,
-                    updateFrequency: CoreSite.FREQUENCY_RARELY,
-                    ...strategyPreSets,
+                    getFromCache: false
+                    // cacheKey: this.getUserCoursesCacheKey(),
+                    // getCacheUsingCacheKey: true,
+                    // updateFrequency: CoreSite.FREQUENCY_RARELY,
+                    // ...strategyPreSets,
                 };
 
             if (site.isVersionGreaterEqualThan('3.7')) {
@@ -866,6 +868,129 @@ export class CoreCoursesProvider {
         });
     }
 
+    saveRalphLogin(preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+        if (typeof preferCache == 'undefined') {
+            preferCache = false;
+        }
+        return this.sitesProvider.getSite(siteId).then((site)  => {
+            let userid = site.getUserId(),
+                presets = {
+                    getFromCache : false,
+                },
+                data = {userid: userid};
+            return site.read('local_ralphlauren_save_ralph_login', data, presets).then((result) => {
+                return result;
+            });
+        });
+    }
+
+    // tslint:disable-next-line:max-line-length
+    getUserCoursesByRoadMapItem(roadMapItem: number, preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId,
+                    roadmapitem: roadMapItem,
+                },
+                preSets = {
+                    getFromCache: false
+                };
+
+            return site.read('core_enrol_get_users_courses_by_roadmapitem', data, preSets).then((courses) => {
+
+                this.userCoursesIds = {};
+
+                // Store the list of courses.
+                courses.forEach((course) => {
+                    this.userCoursesIds[course.id] = true;
+                    if (course.imageurl.includes('?')) {
+                        course.imageurl = courses.imageurl + '&token=' + site.getToken();
+                    }
+                    else {
+                        courses.imageurl = courses.imageurl + '?token=' + site.getToken();
+                    }
+                });
+
+                return courses;
+            });
+        });
+    }
+
+    getFavoriteCourses(preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy ): Promise<any[]> {
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId
+                },
+                preSets = {
+                    getFromCache: false
+                };
+
+            if (site.isVersionGreaterEqualThan('3.7')) {
+                data.returnusercount = 0;
+            }
+
+            return site.read('core_enrol_get_users_favorite_courses', data, preSets).then((courses) => {
+                if (this.userCoursesIds) {
+                    // Check if the list of courses has changed.
+                    const added = [],
+                        removed = [],
+                        previousIds = Object.keys(this.userCoursesIds),
+                        currentIds = {}; // Use an object to make it faster to search.
+
+                    courses.forEach((course) => {
+                        currentIds[course.id] = true;
+
+                        if (!this.userCoursesIds[course.id]) {
+                            // Course added.
+                            added.push(course.id);
+                        }
+                    });
+
+                    if (courses.length - added.length != previousIds.length) {
+                        // A course was removed, check which one.
+                        previousIds.forEach((id) => {
+                            if (!currentIds[id]) {
+                                // Course removed.
+                                removed.push(Number(id));
+                            }
+                        });
+                    }
+
+                    if (added.length || removed.length) {
+                        // At least 1 course was added or removed, trigger the event.
+                        this.eventsProvider.trigger(CoreCoursesProvider.EVENT_MY_COURSES_CHANGED, {
+                            added: added,
+                            removed: removed
+                        }, site.getId());
+                    }
+
+                    this.userCoursesIds = currentIds;
+                } else {
+                    this.userCoursesIds = {};
+
+                    // Store the list of courses.
+                    courses.forEach((course) => {
+                        this.userCoursesIds[course.id] = true;
+                    });
+                }
+
+                courses.forEach((course) => {
+                    if (course.imageurl.includes('?')) {
+                        course.imageurl = courses.imageurl + '&token=' + site.getToken();
+                    }
+                    else {
+                        courses.imageurl = courses.imageurl + '?token=' + site.getToken();
+                    }
+                });
+
+                return courses;
+            });
+        });
+    }
+
     redeemCoupons(couponIds: string, preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
 
         return this.sitesProvider.getSite(siteId).then((site) => {
@@ -876,7 +1001,7 @@ export class CoreCoursesProvider {
                     couponids: couponIds
                 },
                 preSets = {
-                    getFromCache: 0
+                    getFromCache: false
                 };
 
             return site.read('local_ralphlauren_redeem_user_coupons', data, preSets).then((result) => {
@@ -893,11 +1018,49 @@ export class CoreCoursesProvider {
                     userid: userId
                 },
                 preSets = {
-                    getFromCache: 0
+                    getFromCache: false
                 };
 
             return site.read('local_ralphlauren_get_user_coupons', data, preSets).then((coupons) => {
                 return coupons;
+            });
+        });
+    }
+
+    getBookmarkState(courseId: number,
+                     preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId,
+                    courseid: courseId
+                },
+                preSets = {
+                    getFromCache: false
+                };
+
+            return site.read('core_enrol_get_course_bookmark_state', data, preSets).then((bookmark) => {
+                return bookmark;
+            });
+        });
+    }
+
+    setBookmark(courseId: number, bookmark: number,
+                preferCache?: boolean, siteId?: string, strategy?: CoreSitesReadingStrategy): Promise<any[]> {
+        return this.sitesProvider.getSite(siteId).then((site) => {
+
+            const userId = site.getUserId(),
+                data: any = {
+                    userid: userId,
+                    courseid: courseId,
+                    bookmark: bookmark
+                },
+                preSets = {
+                    getFromCache: false
+                };
+            return site.read('local_ralphlauren_set_course_bookmark', data, preSets).then((res) => {
+                return res.result;
             });
         });
     }

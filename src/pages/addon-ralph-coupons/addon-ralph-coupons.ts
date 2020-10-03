@@ -2,12 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { TranslateService } from '@ngx-translate/core';
 import { CoreCoursesProvider } from '@core/courses/providers/courses';
-import { CoreEventsProvider } from '@providers/events';
-import { CoreSitesProvider } from '@providers/sites';
 import { CoreDomUtilsProvider } from '@providers/utils/dom';
-import { CoreCoursesHelperProvider } from '@core/courses/providers/helper';
-import { CoreCourseHelperProvider } from '@core/course/providers/helper';
-import { CoreCourseOptionsDelegate } from '@core/course/providers/options-delegate';
 
 /**
  * Generated class for the AddonRalphCouponsPage page.
@@ -47,7 +42,6 @@ export class AddonRalphCouponsPage  implements OnInit, OnDestroy  {
       this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcoupons', true);
     });
   }
-
 
   ngOnDestroy(): void {
 

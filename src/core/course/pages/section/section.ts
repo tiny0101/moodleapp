@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, ViewChild, OnDestroy, Injector } from '@angular/core';
+import { Component, ViewChild, OnDestroy, Injector, Provider } from '@angular/core';
 import { IonicPage, NavParams, Content, NavController } from 'ionic-angular';
 import { TranslateService } from '@ngx-translate/core';
 import { CoreEventsProvider } from '@providers/events';
@@ -63,6 +63,10 @@ export class CoreCourseSectionPage implements OnDestroy {
     displayEnableDownload: boolean;
     displayRefresher: boolean;
 
+    settingBookmark: boolean;
+    bookmarkIcon: string;
+    displayBookMark = false;
+
     protected module: any;
     protected modParams: any;
     protected completionObserver;
@@ -92,6 +96,7 @@ export class CoreCourseSectionPage implements OnDestroy {
             courseFormatDelegate.displayEnableDownload(this.course);
         this.downloadCourseEnabled = !this.coursesProvider.isDownloadCourseDisabledInSite();
 
+        this.settingBookmark = false;
         // Check if the course format requires the view to be refreshed when completion changes.
         courseFormatDelegate.shouldRefreshWhenCompletionChanges(this.course).then((shouldRefresh) => {
             if (shouldRefresh) {
@@ -152,6 +157,12 @@ export class CoreCourseSectionPage implements OnDestroy {
             this.moduleId = this.module.id;
             this.courseHelper.openModule(this.navCtrl, this.module, this.course.id, this.sectionId, this.modParams);
         }
+
+        this.bookmarkIcon = 'fa-bookmark-o';
+        this.displayBookMark = false;
+        this.getBookmarkState().finally(() => {
+            this.displayBookMark = true;
+        });
 
         this.loadData(false, true).finally(() => {
             this.dataLoaded = true;
@@ -476,6 +487,70 @@ export class CoreCourseSectionPage implements OnDestroy {
      */
     openCourseSummary(): void {
         this.navCtrl.push('CoreCoursesCoursePreviewPage', {course: this.course, avoidOpenCourse: true});
+    }
+
+    bookmarkCourse(): void {
+        this.setBookmark().finally(() => {
+
+        });
+    }
+
+    setBookmark(): Promise<void> {
+
+        let bookmark = 0;
+        if (this.course.bookmark == 0 || this.course.bookmark == undefined) {
+            bookmark = 1;
+        }
+        else if (this.course.bookmark == 1) {
+            bookmark = 0;
+        }
+        this.settingBookmark = true;
+        this.bookmarkIcon = this.getBookmarkIcon();
+
+        return this.coursesProvider.setBookmark(this.course.id, bookmark).then((result) => {
+
+            this.settingBookmark = false;
+            // @ts-ignore
+            if (result == 1) {
+                this.course.bookmark = bookmark;
+            }
+            this.bookmarkIcon = this.getBookmarkIcon();
+
+        }).catch((error) => {
+            this.settingBookmark = false;
+            this.bookmarkIcon = this.getBookmarkIcon();
+            this.domUtils.showErrorModalDefault(error, 'mm.courses.errorsetbookmark', true);
+        });
+    }
+
+    getBookmarkState(): Promise<void> {
+
+        this.settingBookmark = true;
+        this.bookmarkIcon = this.getBookmarkIcon();
+
+        return this.coursesProvider.getBookmarkState(this.course.id).then((result) => {
+            this.settingBookmark = false;
+            this.course.bookmark = result.bookmark;
+            this.bookmarkIcon = this.getBookmarkIcon();
+
+        }).catch((error) => {
+            this.settingBookmark = false;
+            this.bookmarkIcon = this.getBookmarkIcon();
+            this.domUtils.showErrorModalDefault(error, 'mm.courses.errorgetbookmark', true);
+        });
+    }
+
+    getBookmarkIcon(): string {
+        //
+        if (this.settingBookmark) {
+            return 'spinner';
+        } else if (this.course.bookmark == undefined) {
+            return 'fa-bookmark-o';
+        } else if (this.course.bookmark == 1) {
+            return 'fa-bookmark';
+        } else {
+            return 'fa-bookmark-o';
+        }
     }
 
     /**

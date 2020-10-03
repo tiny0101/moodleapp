@@ -16,6 +16,43 @@
             <ion-spinner></ion-spinner>
         </ion-item>
 
+        <div *ngIf="showCategories" class="menu-category-item-group">
+            <div *ngFor="let sm of sidemenus">
+                <div class="menu-category-item-group" *ngIf="sm.visible">
+                    <a class="menu-category-item" style="border-width: 0px; padding-left: 15px; " *ngIf="!sm.parent" (click)="onSelCategory(sm.id)">
+                        <!--                <a ion-item style="border-width: 0px; padding-left: 15px;" *ngIf="!sm.parent">-->
+                        {{sm.label}}
+                        <!--                <span class="badge badge-positive">1</span>-->
+                        <!--                <ion-spinner ng-if="loading" class="icon"></ion-spinner>-->
+                        <!--                    <img src="assets/img/down.png" style="position:absolute; right: 15px;"/>-->
+                        <img src="assets/img/down.png" style="position:absolute; right: 15px;" *ngIf="sm.hasChildren" [hidden]="sm.expanded" (click)="onCollapseCategory(sm.id); $event.stopPropagation();"/>
+                        <img src="assets/img/up.png" style="position:absolute; right: 15px;" *ngIf="sm.hasChildren" [hidden]="!sm.expanded" (click)="onCollapseCategory(sm.id); $event.stopPropagation();"/>
+                    </a>
+                    <a menuClose class="menu-category-item item item-icon-left" style="border-width: 0px; padding-left: 30px;" *ngIf="sm.parent" [hidden]="!sm.visible" (click)="onSelCategory(sm.id)">
+                        {{sm.label}}
+                        <!--                <span [hidden]="loading || badge" class="badge badge-positive">1</span>-->
+                        <!--                <ion-spinner *ngIf="loading" class="icon"></ion-spinner>-->
+                    </a>
+                </div>
+                <div *ngIf="!sm.visible">
+                    <a class="menu-category-item" style="border-width: 0px; padding-left: 15px; " *ngIf="!sm.parent" (click)="onSelCategory(sm.id)">
+                        <!--                <a ion-item style="border-width: 0px; padding-left: 15px;" *ngIf="!sm.parent">-->
+                        {{sm.label}}
+                        <!--                <span class="badge badge-positive">1</span>-->
+                        <!--                <ion-spinner ng-if="loading" class="icon"></ion-spinner>-->
+                        <!--                    <img src="assets/img/down.png" style="position:absolute; right: 15px;"/>-->
+                        <img src="assets/img/down.png" style="position:absolute; right: 15px;" *ngIf="sm.hasChildren" [hidden]="sm.expanded" (click)="onCollapseCategory(sm.id); $event.stopPropagation();"/>
+                        <img src="assets/img/up.png" style="position:absolute; right: 15px;" *ngIf="sm.hasChildren" [hidden]="!sm.expanded" (click)="onCollapseCategory(sm.id); $event.stopPropagation();"/>
+                    </a>
+                    <a menuClose class="menu-category-item item item-icon-left" style="border-width: 0px; padding-left: 30px; padding-top: 7px; padding-bottom: 7px;" *ngIf="sm.parent" [hidden]="!sm.visible" (click)="onSelCategory(sm.id)">
+                        {{sm.label}}
+                        <!--                <span [hidden]="loading || badge" class="badge badge-positive">1</span>-->
+                        <!--                <ion-spinner *ngIf="loading" class="icon"></ion-spinner>-->
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <a *ngIf="showRoadMap" ion-item (click)="openRoadMap()" title="{{ 'mm.ralph.sidemenu.roadmap' | translate }}">
             <core-icon name="fa-map-marker" item-start></core-icon>
             <h2>{{ 'mm.ralph.sidemenu.roadmap' | translate }}</h2>
@@ -26,6 +63,10 @@
             <h2>{{ 'mm.ralph.sidemenu.coupons' | translate }}</h2>
         </a>
 
+        <a *ngIf="showFavorites" ion-item (click)="onSelFavorites()" title="{{ 'mm.ralph.sidemenu.favorites' | translate }}">
+            <core-icon name="fa-star" item-start></core-icon>
+            <h2>{{ 'mm.ralph.sidemenu.favorites' | translate }}</h2>
+        </a>
         <a ion-item *ngFor="let handler of handlers" [ngClass]="['core-moremenu-handler', handler.class || '']" (click)="openHandler(handler)" title="{{ handler.title | translate }}" detail-push>
             <core-icon [name]="handler.icon" item-start></core-icon>
             <h2>{{ handler.title | translate}}</h2>

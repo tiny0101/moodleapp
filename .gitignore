@@ -47,3 +47,10 @@ e2e/build
 !/desktop/electron.js
 src/configconstants.ts
 .moodleapp-dev-config
+report.20201002.133651.17518.0.001.json
+report.20201002.132827.17259.0.001.json
+report.20200930.225823.8578.0.001.json
+report.20200930.223841.7980.0.001.json
+report.20200930.222845.7603.0.001.json
+report.20200930.222048.2402.0.001.json
+report.20200929.204952.34249.0.001.json

@@ -1804,7 +1804,7 @@ export class CoreSite {
             return false;
         }
 
-        console.log('disabledFeatures:-', disabledFeatures);
+        // console.log('disabledFeatures:-', disabledFeatures);
 
         const regEx = new RegExp('(,|^)' + this.textUtils.escapeForRegex(name) + '(,|$)', 'g');
 

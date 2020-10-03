@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Input } from '@angular/core';
 import { Searchbar } from 'ionic-angular';
 import { CoreEventsProvider } from '@providers/events';
 import { CoreSitesProvider } from '@providers/sites';
@@ -31,6 +31,9 @@ import { CoreCourseOptionsDelegate } from '@core/course/providers/options-delega
 })
 export class CoreCoursesMyCoursesComponent implements OnInit, OnDestroy {
     @ViewChild('searchbar') searchbar: Searchbar;
+    @Input('itemKey') itemKey: number;
+    @Input('keyIsCategoryOrRoadMapItemOrFavorites') keyIsCategoryOrRoadMapItemOrFavorites: number;
+    @Input('isFavoritePage') isFavoritePage: boolean;
 
     courses: any[];
     filteredCourses: any[];
@@ -40,6 +43,8 @@ export class CoreCoursesMyCoursesComponent implements OnInit, OnDestroy {
     coursesLoaded = false;
     prefetchCoursesData: any = {};
     downloadAllCoursesEnabled: boolean;
+    categoryId: number;
+    roadMapItem: number;
 
     protected prefetchIconInitialized = false;
     protected myCoursesObserver;
@@ -48,9 +53,11 @@ export class CoreCoursesMyCoursesComponent implements OnInit, OnDestroy {
     protected courseIds = '';
 
     constructor(private coursesProvider: CoreCoursesProvider,
-            private domUtils: CoreDomUtilsProvider, private eventsProvider: CoreEventsProvider,
-            private sitesProvider: CoreSitesProvider, private courseHelper: CoreCourseHelperProvider,
-            private courseOptionsDelegate: CoreCourseOptionsDelegate, private coursesHelper: CoreCoursesHelperProvider) { }
+                private domUtils: CoreDomUtilsProvider, private eventsProvider: CoreEventsProvider,
+                private sitesProvider: CoreSitesProvider, private courseHelper: CoreCourseHelperProvider,
+                private courseOptionsDelegate: CoreCourseOptionsDelegate, private coursesHelper: CoreCoursesHelperProvider) {
+
+    }
 
     /**
      * Component being initialized.
@@ -59,18 +66,36 @@ export class CoreCoursesMyCoursesComponent implements OnInit, OnDestroy {
         this.searchEnabled = !this.coursesProvider.isSearchCoursesDisabledInSite();
         this.downloadAllCoursesEnabled = !this.coursesProvider.isDownloadCoursesDisabledInSite();
 
+        this.isFavoritePage = false;
+        if (this.keyIsCategoryOrRoadMapItemOrFavorites == 1) {
+            this.categoryId = this.itemKey;
+        }
+        else if (this.keyIsCategoryOrRoadMapItemOrFavorites == 2) {
+            this.roadMapItem = this.itemKey;
+        }
+        else if (this.keyIsCategoryOrRoadMapItemOrFavorites == 3) {
+            this.isFavoritePage = true;
+        }
+        else {
+            this.keyIsCategoryOrRoadMapItemOrFavorites = 1;
+            this.categoryId = this.itemKey;
+        }
+
+        console.log("keyIsCategoryOrRoadMapItemOrFavorites:-", this.keyIsCategoryOrRoadMapItemOrFavorites);
+        console.log("itemKey:-", this.itemKey);
+
         this.fetchCourses().finally(() => {
             this.coursesLoaded = true;
         });
 
         // Update list if user enrols in a course.
         this.myCoursesObserver = this.eventsProvider.on(CoreCoursesProvider.EVENT_MY_COURSES_UPDATED,
-                (data: CoreCoursesMyCoursesUpdatedEventData) => {
+            (data: CoreCoursesMyCoursesUpdatedEventData) => {
 
-            if (data.action == CoreCoursesProvider.ACTION_ENROL) {
-                this.fetchCourses();
-            }
-        }, this.sitesProvider.getCurrentSiteId());
+                if (data.action == CoreCoursesProvider.ACTION_ENROL) {
+                    this.fetchCourses();
+                }
+            }, this.sitesProvider.getCurrentSiteId());
 
         // Refresh the enabled flags if site is updated.
         this.siteUpdatedObserver = this.eventsProvider.on(CoreEventsProvider.SITE_UPDATED, () => {
@@ -92,35 +117,245 @@ export class CoreCoursesMyCoursesComponent implements OnInit, OnDestroy {
      * @return Promise resolved when done.
      */
     protected fetchCourses(): Promise<any> {
-        return this.coursesProvider.getUserCourses().then((courses) => {
-            const promises = [],
-                courseIds = courses.map((course) => {
-                return course.id;
-            });
+        // return this.coursesProvider.getUserCourses().then((courses) => {
+        //     const promises = [],
+        //         courseIds = courses.map((course) => {
+        //             return course.id;
+        //         });
+        //
+        //     this.courseIds = courseIds.join(',');
+        //
+        //     promises.push(this.coursesHelper.loadCoursesExtraInfo(courses));
+        //
+        //     if (this.coursesProvider.canGetAdminAndNavOptions()) {
+        //         promises.push(this.coursesProvider.getCoursesAdminAndNavOptions(courseIds).then((options) => {
+        //             courses.forEach((course) => {
+        //                 course.navOptions = options.navOptions[course.id];
+        //                 course.admOptions = options.admOptions[course.id];
+        //             });
+        //         }));
+        //     }
+        //
+        //     return Promise.all(promises).then(() => {
+        //         this.courses = courses;
+        //         this.filteredCourses = this.courses;
+        //         this.filter = '';
+        //
+        //         this.initPrefetchCoursesIcon();
+        //     });
+        // }).catch((error) => {
+        //     this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcourses', true);
+        // });
 
-            this.courseIds = courseIds.join(',');
+        if (this.keyIsCategoryOrRoadMapItemOrFavorites == 1) {
+            return this.coursesProvider.getUserCourses().then((courses) => {
 
-            promises.push(this.coursesHelper.loadCoursesExtraInfo(courses));
+                var belongedCategories1 = [];
+                var belongedCategories = [];
+                var userCourses = [];
 
-            if (this.coursesProvider.canGetAdminAndNavOptions()) {
-                promises.push(this.coursesProvider.getCoursesAdminAndNavOptions(courseIds).then((options) => {
-                    courses.forEach((course) => {
-                        course.navOptions = options.navOptions[course.id];
-                        course.admOptions = options.admOptions[course.id];
+                courses.forEach((course) => {
+
+                    if (course.category == this.categoryId) {
+                        belongedCategories1.push(course);
+                        course['enrol_status'] = 'enrolled';
+                        userCourses['course' + course.id] = course;
+                    }
+                });
+
+                var userCourseIds = belongedCategories1.map((course) => {
+                    return course.id;
+                });
+
+                const promises = [],
+                    courseIds = courses.map((course) => {
+                        return course.id;
                     });
-                }));
-            }
 
-            return Promise.all(promises).then(() => {
-                this.courses = courses;
-                this.filteredCourses = this.courses;
-                this.filter = '';
+                this.courseIds = courseIds.join(',');
 
-                this.initPrefetchCoursesIcon();
+                return this.coursesProvider.getCoursesByField('category', this.categoryId).then((courses) => {
+                    const currentSite = this.sitesProvider.getCurrentSite();
+                    courses.forEach((course) => {
+                        if (course['imageurl'].includes('?')) {
+                            course['imageurl'] = course['imageurl'] + '&token=' + currentSite.getToken();
+                        } else {
+                            course['imageurl'] = course['imageurl'] + '?token=' + currentSite.getToken();
+                        }
+
+                        if (userCourseIds.includes(course.id)) {
+                            belongedCategories.push(userCourses['course' + course.id]);
+                        } else {
+                            course['enrol_status'] = "not_enrolled";
+                            belongedCategories.push(course);
+                        }
+                    });
+
+                    this.courses = belongedCategories;
+
+                    var courseIds = belongedCategories.map((course) => {
+                        return course.id;
+                    });
+
+                    const promises = [];
+                    this.courseIds = courseIds.join(',');
+
+                    promises.push(this.coursesHelper.loadCoursesExtraInfo(courses));
+
+                    if (this.coursesProvider.canGetAdminAndNavOptions()) {
+                        promises.push(this.coursesProvider.getCoursesAdminAndNavOptions(courseIds).then((options) => {
+                            courses.forEach((course) => {
+                                course.navOptions = options.navOptions[course.id];
+                                course.admOptions = options.admOptions[course.id];
+                            });
+                        }));
+                    }
+
+                    return Promise.all(promises).then(() => {
+                        this.courses = courses;
+                        this.filteredCourses = this.courses;
+                        this.filter = '';
+
+                        this.initPrefetchCoursesIcon();
+                    });
+
+                });
+
+            }).catch((error) => {
+                this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcourses', true);
             });
-        }).catch((error) => {
-            this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcourses', true);
-        });
+        }
+        else if (this.keyIsCategoryOrRoadMapItemOrFavorites == 2) {
+            return this.coursesProvider.getUserCoursesByRoadMapItem(this.roadMapItem, true).then((courses) => {
+                var belongedCategories1 = [];
+                var belongedCategories = [];
+                var userCourses = [];
+                courses.forEach((course) => {
+                    belongedCategories1.push(course);
+                    course['enrol_status'] = 'enrolled';
+                    userCourses['course' + course.id] = course;
+
+                });
+
+                var userCourseIds = belongedCategories1.map((course) => {
+                    return course.id;
+                });
+
+                return this.coursesProvider.getCoursesByField('assignroadmap', this.roadMapItem).then((courses) => {
+
+                    console.log('getCoursesByFieldroadmap:-', courses);
+                    courses.forEach((course) => {
+                        if (course['category'] == 0) {
+                            return;
+                        }
+
+                        const currentSite = this.sitesProvider.getCurrentSite();
+                        if (course['imageurl'].includes('?')) {
+                            course['imageurl'] = course['imageurl'] + '&token=' + currentSite.getToken();
+                        } else {
+                            course['imageurl'] = course['imageurl'] + '?token=' + currentSite.getToken();
+                        }
+
+                        if (userCourseIds.includes(course.id)) {
+                            belongedCategories.push(userCourses['course' + course.id]);
+                        }
+                        else {
+                            course['enrol_status'] = "not_enrolled";
+                            belongedCategories.push(course);
+                        }
+                    });
+
+                    const promises = [];
+                    this.courseIds = userCourseIds.join(',');
+
+                    promises.push(this.coursesHelper.loadCoursesExtraInfo(courses));
+
+                    if (this.coursesProvider.canGetAdminAndNavOptions()) {
+                        promises.push(this.coursesProvider.getCoursesAdminAndNavOptions(userCourseIds).then((options) => {
+                            courses.forEach((course) => {
+                                course.navOptions = options.navOptions[course.id];
+                                course.admOptions = options.admOptions[course.id];
+                            });
+                        }));
+                    }
+
+                    return Promise.all(promises).then(() => {
+                        this.courses = courses;
+                        this.filteredCourses = this.courses;
+                        this.filter = '';
+
+                        this.initPrefetchCoursesIcon();
+                    });
+                });
+            }).catch ((error) => {
+                this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcourses', true);
+            });
+        }
+        else if (this.keyIsCategoryOrRoadMapItemOrFavorites == 3) {
+            return this.coursesProvider.getFavoriteCourses().then((courses) => {
+
+                var belongedCategories1 = [];
+                var belongedCategories = [];
+                var userCourses = [];
+                courses.forEach((course) => {
+                    belongedCategories1.push(course);
+                    course['enrol_status'] = 'enrolled';
+                    userCourses['course' + course.id] = course;
+                });
+
+                var userCourseIds = belongedCategories1.map((course) => {
+                    return course.id;
+                });
+
+                const currentSite = this.sitesProvider.getCurrentSite();
+
+                return this.coursesProvider.getCoursesByField('userIdToGetFavoriteCourses', currentSite.getUserId())
+                    .then((courses) => {
+
+                    courses.forEach((course) => {
+                        if (course['imageurl'].includes('?')) {
+                            course['imageurl'] = course['imageurl'] + '&token=' + currentSite.getToken();
+                        } else {
+                            course['imageurl'] = course['imageurl'] + '?token=' + currentSite.getToken();
+                        }
+                        // if (course.categoryid == categoryId) {
+                        if (userCourseIds.includes(course.id)) {
+                            belongedCategories.push(userCourses['course' + course.id]);
+                        }
+                        else {
+                            course['enrol_status'] = "not_enrolled";
+                            belongedCategories.push(course);
+                        }
+
+                        // }
+                    });
+
+                    const promises = [];
+                    this.courseIds = userCourseIds.join(',');
+
+                    promises.push(this.coursesHelper.loadCoursesExtraInfo(courses));
+
+                    if (this.coursesProvider.canGetAdminAndNavOptions()) {
+                        promises.push(this.coursesProvider.getCoursesAdminAndNavOptions(userCourseIds).then((options) => {
+                            courses.forEach((course) => {
+                                course.navOptions = options.navOptions[course.id];
+                                course.admOptions = options.admOptions[course.id];
+                            });
+                        }));
+                    }
+
+                    return Promise.all(promises).then(() => {
+                        this.courses = courses;
+                        this.filteredCourses = this.courses;
+                        this.filter = '';
+
+                        this.initPrefetchCoursesIcon();
+                    });
+                });
+            }).catch ((error) => {
+                this.domUtils.showErrorModalDefault(error, 'core.courses.errorloadcourses', true);
+            });
+        }
     }
 
     /**

@@ -51,7 +51,6 @@ export class CoreCoursesDashboardPage implements OnDestroy {
     userId: number;
     dashboardLoaded = false;
 
-
     downloadEnabled: boolean;
     downloadEnabledIcon = 'square-outline'; // Disabled by default.
     downloadCourseEnabled: boolean;

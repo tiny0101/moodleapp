@@ -167,12 +167,14 @@ export class CoreLoginCredentialsPage {
      */
     protected treatSiteConfig(): void {
         if (this.siteConfig) {
+            console.log('this.siteConfig-', this.siteConfig);
             this.siteName = CoreConfigConstants.sitename ? CoreConfigConstants.sitename : this.siteConfig.sitename;
             this.logoUrl = this.loginHelper.getLogoUrl(this.siteConfig);
             this.authInstructions = this.siteConfig.authinstructions || this.translate.instant('core.login.loginsteps');
 
             const disabledFeatures = this.loginHelper.getDisabledFeatures(this.siteConfig);
             this.identityProviders = this.loginHelper.getValidIdentityProviders(this.siteConfig, disabledFeatures);
+            console.log('this.identityProviders:-', this.identityProviders);
             this.canSignup = this.siteConfig.registerauth == 'email' &&
                     !this.loginHelper.isEmailSignupDisabled(this.siteConfig, disabledFeatures);
             this.showForgottenPassword = !this.loginHelper.isForgottenPasswordDisabled(this.siteConfig, disabledFeatures);
@@ -182,6 +184,7 @@ export class CoreLoginCredentialsPage {
                 this.eventsProvider.trigger(CoreEventsProvider.LOGIN_SITE_CHECKED, { config: this.siteConfig });
             }
         } else {
+            console.log('case2');
             this.authInstructions = null;
             this.canSignup = false;
             this.identityProviders = [];
@@ -276,9 +279,15 @@ export class CoreLoginCredentialsPage {
      * @param provider The provider that was clicked.
      */
     oauthClicked(provider: any): void {
-        if (!this.loginHelper.openBrowserForOAuthLogin(this.siteUrl, provider, this.siteConfig.launchurl)) {
-            this.domUtils.showErrorModal('Invalid data.');
-        }
+        this.checkSite(this.siteUrl).then(() => {
+            // if (!this.isBrowserSSO) {
+            //     // Site doesn't use browser SSO, throw app's login again.
+            //     return this.login();
+            // }
+        });
+        // if (!this.loginHelper.openBrowserForOAuthLogin(this.siteUrl, provider, this.siteConfig.launchurl)) {
+        //     this.domUtils.showErrorModal('Invalid data.');
+        // }
     }
 
     /**

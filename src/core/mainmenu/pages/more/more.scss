@@ -94,4 +94,15 @@ ion-app.app-root page-core-mainmenu-more {
             }
         }
     }
+
+    .menu-category-item {
+        font-size: 1.7rem;
+        color: #3a3a3a !important;
+        background: white !important;
+
+    }
+    .menu-category-item-group {
+        background: white !important;
+        padding: 7px;
+    }
 }

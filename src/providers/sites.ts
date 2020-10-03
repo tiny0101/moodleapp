@@ -1231,22 +1231,22 @@ export class CoreSitesProvider {
             this.currentSite.token != '';
     }
 
-    saveRalphLogin(): void {
-
-        this.getSite(siteid).then(function(site) {
-            var userid = site.getUserId(),
-                presets = {
-                    getFromCache : 0,
-                },
-                data = {userid: userid};
-            if (typeof userid === 'undefined') {
-                return $q.reject();
-            }
-            return site.read('local_ralphlauren_save_ralph_login', data, presets).then(function(result) {
-                return result;
-            });
-        });
-    }
+    // saveRalphLogin(): void {
+    //
+    //     this.getSite(siteid).then(function(site) {
+    //         var userid = site.getUserId(),
+    //             presets = {
+    //                 getFromCache : 0,
+    //             },
+    //             data = {userid: userid};
+    //         if (typeof userid === 'undefined') {
+    //             return $q.reject();
+    //         }
+    //         return site.read('local_ralphlauren_save_ralph_login', data, presets).then(function(result) {
+    //             return result;
+    //         });
+    //     });
+    // }
     /**
      * Delete a site from the sites list.
      *

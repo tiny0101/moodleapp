@@ -477,6 +477,7 @@ export class CoreLoginHelperProvider {
     getValidIdentityProviders(siteConfig: any, disabledFeatures?: string): any[] {
         if (this.isFeatureDisabled('NoDelegate_IdentityProviders', siteConfig, disabledFeatures)) {
             // Identity providers are disabled, return an empty list.
+            console.log("case1");
             return [];
         }
 
@@ -484,14 +485,23 @@ export class CoreLoginHelperProvider {
             httpUrl = this.textUtils.concatenatePaths(siteConfig.wwwroot, 'auth/oauth2/'),
             httpsUrl = this.textUtils.concatenatePaths(siteConfig.httpswwwroot, 'auth/oauth2/');
 
+        console.log("step1");
+        console.log('siteConfig:-', siteConfig.identityproviders);
         if (siteConfig.identityproviders && siteConfig.identityproviders.length) {
+            console.log("step1-0.5");
             siteConfig.identityproviders.forEach((provider) => {
                 const urlParams = this.urlUtils.extractUrlParams(provider.url);
+                console.log("step1-1", urlParams);
 
-                if (provider.url && (provider.url.indexOf(httpsUrl) != -1 || provider.url.indexOf(httpUrl) != -1) &&
-                        !this.isFeatureDisabled('NoDelegate_IdentityProvider_' + urlParams.id, siteConfig, disabledFeatures)) {
+                if (provider.url && !this.isFeatureDisabled('NoDelegate_IdentityProvider_' + urlParams.id, siteConfig, disabledFeatures)) {
                     validProviders.push(provider);
+                    console.log("step2");
                 }
+                // if (provider.url && (provider.url.indexOf(httpsUrl) != -1 || provider.url.indexOf(httpUrl) != -1) &&
+                //         !this.isFeatureDisabled('NoDelegate_IdentityProvider_' + urlParams.id, siteConfig, disabledFeatures)) {
+                //     validProviders.push(provider);
+                //     console.log("step2");
+                // }
             });
         }
 
@@ -855,12 +865,14 @@ export class CoreLoginHelperProvider {
     openBrowserForOAuthLogin(siteUrl: string, provider: any, launchUrl?: string, pageName?: string, pageParams?: any): boolean {
         launchUrl = launchUrl || siteUrl + '/admin/tool/mobile/launch.php';
         if (!provider || !provider.url) {
+            console.log("openOAuth-case1");
             return false;
         }
 
         const params = this.urlUtils.extractUrlParams(provider.url);
-
+        console.log('params:-', params);
         if (!params.id) {
+            console.log("openOAuth-case2");
             return false;
         }
 

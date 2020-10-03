@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { CoreCoursesMyCoursesComponent } from '../../components/my-courses/my-courses';
 
 /**
@@ -27,7 +27,15 @@ import { CoreCoursesMyCoursesComponent } from '../../components/my-courses/my-co
 export class CoreCoursesMyCoursesPage {
     @ViewChild(CoreCoursesMyCoursesComponent) mcComponent: CoreCoursesMyCoursesComponent;
 
-    constructor(private navCtrl: NavController) { }
+    itemKey = 0;
+    keyIsCategoryOrRoadMapItemOrFavorites = 0;
+    isFavoritePage = 0;
+
+    constructor(private navCtrl: NavController, private navParams: NavParams) {
+        this.itemKey = navParams.get('itemKey');
+        this.keyIsCategoryOrRoadMapItemOrFavorites = navParams.get('keyIsCategoryOrRoadMapItemOrFavorites');
+        this.isFavoritePage = navParams.get('isFavoritePage');
+    }
 
     /**
      * Go to search courses.

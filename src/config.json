@@ -1,7 +1,7 @@
 {
-    "app_id": "com.moodle.moodlemobile",
-    "appname": "Moodle Mobile",
-    "desktopappname": "Moodle Desktop",
+    "app_id": "com.csslms.digitalpassport",
+    "appname": "DigitalPassport",
+    "desktopappname": "DigitalPassport Desktop",
     "versioncode": 3930,
     "versionname": "3.9.3-dev",
     "cache_update_frequency_usually": 420000,
@@ -58,7 +58,7 @@
         "zh-cn": "简体中文",
         "zh-tw": "正體中文"
     },
-    "wsservice": "moodle_mobile_app",
+    "wsservice": "local_mobile",
     "wsextservice": "local_mobile",
     "demo_sites": {
         "student": {
@@ -86,12 +86,12 @@
     "skipssoconfirmation": false,
     "forcedefaultlanguage": false,
     "privacypolicy": "https:\/\/moodle.net\/moodle-app-privacy\/",
-    "notificoncolor": "#f98012",
+    "notificoncolor": "#2d2dd2",
     "statusbarbg": false,
     "statusbarlighttext": false,
-    "statusbarbgios": "#f98012",
+    "statusbarbgios": "#2d2dd2",
     "statusbarlighttextios": true,
-    "statusbarbgandroid": "#df7310",
+    "statusbarbgandroid": "#2d2dd2",
     "statusbarlighttextandroid": true,
     "statusbarbgremotetheme": "#000000",
     "statusbarlighttextremotetheme": true,

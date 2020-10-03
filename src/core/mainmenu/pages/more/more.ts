@@ -24,6 +24,7 @@ import { CoreMainMenuProvider, CoreMainMenuCustomItem } from '../../providers/ma
 import { CoreLoginHelperProvider } from '@core/login/providers/helper';
 import { CoreContentLinksHelperProvider } from '@core/contentlinks/providers/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { CoreCoursesProvider } from '@core/courses/providers/courses';
 
 /**
  * Page that displays the list of main menu options that aren't in the tabs.
@@ -47,10 +48,17 @@ export class CoreMainMenuMorePage implements OnDestroy {
     customItems: CoreMainMenuCustomItem[];
     siteUrl: string;
 
+    sidemenus: any[];
+    getCategories: boolean;
+    parentCategoryIds: number[];
+    categoriesRetrieved: boolean;
+
     showRoadMap: boolean;
     showCoupons: boolean;
     showPreference: boolean;
     showAppSettings: boolean;
+    showCategories: boolean;
+    showFavorites: boolean;
 
     protected subscription;
     protected langObserver;
@@ -66,6 +74,7 @@ export class CoreMainMenuMorePage implements OnDestroy {
             protected linkHelper: CoreContentLinksHelperProvider,
             protected textUtils: CoreTextUtilsProvider,
             protected urlSchemesProvider: CoreCustomURLSchemesProvider,
+            protected coursesProvider: CoreCoursesProvider,
             protected translate: TranslateService) {
 
         this.langObserver = eventsProvider.on(CoreEventsProvider.LANGUAGE_CHANGED, this.loadSiteInfo.bind(this));
@@ -84,10 +93,133 @@ export class CoreMainMenuMorePage implements OnDestroy {
         this.subscription = this.menuDelegate.getHandlers().subscribe((handlers) => {
             this.allHandlers = handlers;
 
+            this.sidemenus = [];
+            this.parentCategoryIds = [];
             this.initHandlers();
+
+            if (!this.getCategories) {
+                this.getCategories = true;
+                this.loadCourseCategories().finally(() => {
+
+                });
+            }
         });
 
         window.addEventListener('resize', this.initHandlers.bind(this));
+    }
+
+    sortByHierarchyAndDisplayOrder(arr: [any], sort: number): [any] {
+        let i = 0,
+        j = 0,
+        t = 0,
+        parentFound = false,
+        x = arr.length,
+        arr2 = [];
+
+        // Sort by parent asc first
+        arr = arr.sort((a, b) => {
+            if (a.parent < b.parent) { return -1; }
+            if (a.parent > b.parent) { return 1; }
+            return 0;
+        });
+
+        for (; i < x; i += 1) {
+            t = arr2.length;
+            if (t === 0) {  arr2.push(arr[i]); }
+            else if (arr[i].parent === 0) {
+                for (j = 0; j < t; j += 1) {
+                    if (sort === -1) {
+                        if (arr[i].sortorder >= arr2[j].sortorder) { arr2.splice(j, 0, arr[i]); }
+                        break;
+                    } else {
+                        if (arr[i].sortorder <= arr2[j].sortorder) { arr2.splice(j, 0, arr[i]); }
+                        break;
+                    }
+                }
+                if (arr2.length === t) { arr2.push(arr[i]); }
+            }
+            else {
+                parentFound = false;
+                for (j = 0; j < t; j += 1) {
+                    if (arr[i].parent === arr2[j].id) {
+                        if (j === t - 1) {
+                            arr2.push(arr[i]);
+                        }
+                        parentFound = true;
+                    } else if (arr[i].parent === arr2[j].parent) {
+                        if (sort === -1) {
+                            if (j === t - 1) { arr2.push(arr[i]); }
+                            else if (arr[i].sortorder >= arr2[j].sortorder) {
+                                arr2.splice(j, 0, arr[i]);
+                                j = t;
+                            }
+                        } else {
+                            if (j === t - 1) { arr2.push(arr[i]); }
+                            else if (arr[i].sortorder <= arr2[j].sortorder) {
+                                arr2.splice(j, 0, arr[i]);
+                                j = t;
+                            }
+                        }
+                    } else if (arr[i].parent > arr2[j].parent && parentFound) {
+                        arr2.splice(j, 0, arr[i]);
+                        j = t;
+                    }
+                }
+            }
+        }
+        return arr2;
+    }
+
+    onCollapseCategory(id: number): void {
+
+        for (const p in this.sidemenus)
+        {
+            if (this.sidemenus[p].id == id) {
+                this.sidemenus[p].expanded = !this.sidemenus[p].expanded;
+            }
+            if (this.sidemenus[p].parent == id) {
+                this.sidemenus[p].visible = !this.sidemenus[p].visible;
+            }
+        }
+    }
+
+    loadCourseCategories(): Promise<void> {
+        return this.coursesProvider.getCategories(0, true).then((cats) => {
+
+            console.log('categories:-', cats);
+            const sortedCategories = this.sortByHierarchyAndDisplayOrder(cats, 1);
+            // var sortedCategories = cats;
+            this.categoriesRetrieved = true;
+            sortedCategories.forEach((category) => {
+
+                console.log('category.parent:-', category.parent);
+                category.label = this.textUtils.decodeHTML(category['name']);
+                category.hasChildren = 0;
+
+                if (!category.parent) {
+                    category.visible = true;
+                }
+                else {
+                    category.visible = false;
+                }
+
+                if (this.parentCategoryIds.indexOf(category.parent) < 0) {
+                    this.parentCategoryIds.push(category.parent);
+                }
+                this.sidemenus.push(category);
+            });
+
+            console.log('parentCategoryIds:-', this.parentCategoryIds);
+
+            this.sidemenus.forEach((menu) => {
+                if (this.parentCategoryIds.indexOf(menu.id) > 0) {
+                    menu.hasChildren = 1;
+                }
+            });
+
+            console.log('sidemenus:-', this.sidemenus);
+
+        });
     }
 
     /**
@@ -103,6 +235,12 @@ export class CoreMainMenuMorePage implements OnDestroy {
         }
     }
 
+    onSelCategory(categoryId: number): void {
+        this.navCtrl.push('CoreCoursesMyCoursesPage', {
+            itemKey: categoryId,
+            keyIsCategoryOrRoadMapItemOrFavorites: 1
+        });
+    }
     /**
      * Init handlers on change (size or handlers).
      */
@@ -138,9 +276,9 @@ export class CoreMainMenuMorePage implements OnDestroy {
         this.showRoadMap = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaRoadmap');
         this.showCoupons = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaCoupons');
         this.showAppSettings = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaAppSettings');
-
-        // this.showRoadMap = false;
-        // this.showCoupons = false;
+        this.showCategories = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaCourseCategories');
+        this.showFavorites = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaFavorites');
+        this.showScanQR = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaqrscan');
 
         currentSite.getDocsUrl().then((docsUrl) => {
             this.docsUrl = docsUrl;
@@ -148,6 +286,13 @@ export class CoreMainMenuMorePage implements OnDestroy {
 
         this.mainMenuProvider.getCustomMenuItems().then((items) => {
             this.customItems = items;
+        });
+    }
+
+    onSelFavorites (): void {
+        this.navCtrl.push('CoreCoursesMyCoursesPage', {
+            itemKey: 0,
+            keyIsCategoryOrRoadMapItemOrFavorites: 3
         });
     }
 

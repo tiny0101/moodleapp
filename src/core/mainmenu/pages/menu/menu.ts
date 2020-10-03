@@ -22,6 +22,7 @@ import { CoreMainMenuProvider } from '../../providers/mainmenu';
 import { CoreMainMenuDelegate, CoreMainMenuHandlerToDisplay } from '../../providers/delegate';
 import { CoreContentLinksDelegate } from '@core/contentlinks/providers/delegate';
 import { CoreContentLinksHelperProvider } from '@core/contentlinks/providers/helper';
+import { CoreCoursesProvider } from '@core/courses/providers/courses';
 
 /**
  * Page that displays the main menu of the app.
@@ -39,6 +40,9 @@ export class CoreMainMenuPage implements OnDestroy {
     redirectParams: any;
     showTabs = false;
     tabsPlacement = 'bottom';
+
+    showRoadMap = false;
+    showCoupons = false;
 
     protected subscription;
     protected redirectObs: any;
@@ -58,6 +62,7 @@ export class CoreMainMenuPage implements OnDestroy {
             protected mainMenuProvider: CoreMainMenuProvider,
             protected linksDelegate: CoreContentLinksDelegate,
             protected linksHelper: CoreContentLinksHelperProvider,
+                protected coursesProvider: CoreCoursesProvider,
             ) {
 
         this.mainMenuId = CoreApp.instance.getMainMenuId();
@@ -84,6 +89,9 @@ export class CoreMainMenuPage implements OnDestroy {
             return;
         }
 
+        this.coursesProvider.saveRalphLogin().then((result) => {
+
+        });
         this.showTabs = true;
 
         this.redirectObs = this.eventsProvider.on(CoreEventsProvider.LOAD_PAGE_MAIN_MENU, (data) => {
@@ -103,6 +111,12 @@ export class CoreMainMenuPage implements OnDestroy {
             });
 
             this.initHandlers();
+            const currentSite = this.sitesProvider.getCurrentSite();
+
+            if (currentSite) {
+                this.showRoadMap = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaRoadmap');
+                this.showCoupons = !currentSite.isFeatureDisabled('CoreMainMenuDelegate_mmaCoupons');
+            }
 
             if (this.loaded && this.pendingRedirect) {
                 // Wait for tabs to be initialized and then handle the redirect.

@@ -50,15 +50,39 @@ export class CoreLoginSitesPage {
      */
     ionViewDidLoad(): void {
 
+        // let pageName, params;
+        // // Fixed URL is set, go to credentials page.
+        // const url = 'http://localhost:8009';
+        // // const url = 'https://digitalpassport.csslms.com';
+        //
+        // pageName = 'CoreLoginCredentialsPage';
+        // let siteConfig = undefined;
+        // let params = {
+        //     siteUrl: url,
+        //     siteConfig: siteConfig,
+        // };
+        //
+        // CoreApp.instance.getRootNavController().setRoot(pageName, params, { animate: false });
+
         let pageName, params;
         // Fixed URL is set, go to credentials page.
-        const url = 'http://localhost:8009';
+        // const url = 'http://localhost:8009';
+        const url = 'https://digitalpassport.csslms.com';
 
         pageName = 'CoreLoginCredentialsPage';
-        params = { siteUrl: url };
+        let siteConfig = undefined;
 
-        CoreApp.instance.getRootNavController().setRoot(pageName, params, { animate: false });
+        this.sitesProvider.getSitePublicConfig(url).then((config) => {
+            siteConfig = config;
 
+            params = {
+                siteUrl: url,
+                siteConfig: siteConfig,
+            };
+
+            CoreApp.instance.getRootNavController().setRoot(pageName, params, { animate: false });
+        });
+        //
         // this.sitesProvider.getSortedSites().then((sites) => {
         //     if (sites.length == 0) {
         //         this.loginHelper.goToAddSite(true);
